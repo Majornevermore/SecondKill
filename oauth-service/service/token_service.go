@@ -106,7 +106,7 @@ func (tokenGranter *RefreshTokenGranter) Grant(ctx context.Context, grantType st
 
 type TokenService interface {
 	// 根据访问令牌获取对应的用户信息和客户端信息
-	GetOAuth2DetailsByAccessToken(tokenValue string) (*model.OAuth2Token, error)
+	GetOAuth2DetailsByAccessToken(tokenValue string) (*model.OAuth2Details, error)
 	// 根据用户信息和客户端信息生成访问令牌
 	CreateAccessToken(oauth2Details *model.OAuth2Details) (*model.OAuth2Token, error)
 	// 根据刷新令牌获取访问令牌
@@ -129,8 +129,8 @@ func NewTokenService(tokenStore TokenStore, tokenEnhancer TokenEnhancer) TokenSe
 	}
 }
 
-func (tokenService *DefaultTokenService) GetOAuth2DetailsByAccessToken(tokenValue string) (*model.OAuth2Token, error) {
-	return tokenService.tokenStore.ReadAccessToken(tokenValue)
+func (tokenService *DefaultTokenService) GetOAuth2DetailsByAccessToken(tokenValue string) (*model.OAuth2Details, error) {
+	return tokenService.tokenStore.ReadOAuth2Details(tokenValue)
 }
 
 func (tokenService *DefaultTokenService) CreateAccessToken(oauth2Details *model.OAuth2Details) (*model.OAuth2Token, error) {
