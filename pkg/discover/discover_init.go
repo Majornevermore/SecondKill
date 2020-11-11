@@ -1,24 +1,24 @@
 package discover
 
 import (
+	"SecondKill/pkg/bootstrap"
+	"SecondKill/pkg/common"
+	"SecondKill/pkg/loadbalance"
 	"errors"
-	"SpeedKill/pkg/bootstrap"
-	"SpeedKill/pkg/common"
-	"SpeedKill/pkg/loadbalance"
+	uuid "github.com/satori/go.uuid"
 	"log"
 	"os"
-	uuid "github.com/satori/go.uuid"
 )
 
 var (
 	ConsulService DiscoveryClient
-	Logger *log.Logger
-	BalanceS loadbalance.Balance
+	Logger        *log.Logger
+	BalanceS      loadbalance.Balance
 )
 
-var NoInstanceExistedErr  = errors.New("no available client")
+var NoInstanceExistedErr = errors.New("no available client")
 
-func init()  {
+func init() {
 	ConsulService = NewConsulClientInstance(bootstrap.DiscoverConfig.Host, bootstrap.DiscoverConfig.Port)
 	Logger = log.New(os.Stderr, "", log.LstdFlags)
 	BalanceS = new(loadbalance.RandomBalance)
@@ -30,19 +30,19 @@ func Discover(service string) (*common.ServiceInstance, error) {
 	}
 	instances := ConsulService.DiscoverServices(service, Logger)
 	if len(instances) < 1 {
-		return  nil, NoInstanceExistedErr
+		return nil, NoInstanceExistedErr
 	}
 	return BalanceS.SelectBalance(instances)
 }
 
-func Register()  {
+func Register() {
 	instance := bootstrap.DiscoverConfig.InstanceId
 	if instance == "" {
 		instance = bootstrap.DiscoverConfig.ServiceName + uuid.NewV4().String()
 	}
 	if !ConsulService.Register(instance, bootstrap.HttpConfig.Host, "/health",
 		bootstrap.HttpConfig.Port, bootstrap.DiscoverConfig.ServiceName, bootstrap.DiscoverConfig.Weight,
-		map[string]string {
+		map[string]string{
 			"rpcPort": bootstrap.RpcConfig.Port,
 		}, nil, Logger) {
 		Logger.Printf("register service %s failed.", bootstrap.DiscoverConfig.ServiceName)
@@ -52,7 +52,7 @@ func Register()  {
 	Logger.Printf(bootstrap.DiscoverConfig.ServiceName+"-service for service %s success.", bootstrap.DiscoverConfig.ServiceName)
 }
 
-func DeRegister()  {
+func DeRegister() {
 	if ConsulService == nil {
 		return
 	}

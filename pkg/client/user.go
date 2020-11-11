@@ -1,9 +1,9 @@
 package client
 
 import (
-	"SpeedKill/pb"
-	"SpeedKill/pkg/discover"
-	"SpeedKill/pkg/loadbalance"
+	"SecondKill/pb"
+	"SecondKill/pkg/discover"
+	"SecondKill/pkg/loadbalance"
 	"context"
 	"github.com/opentracing/opentracing-go"
 )
@@ -28,7 +28,7 @@ func (u *UserClientImpl) CheckUser(ctx context.Context, tracer opentracing.Trace
 	}
 }
 
-func NewUserClient(serviceName string, lb loadbalance.Balance, tracer opentracing.Tracer)  (UserClient, error)    {
+func NewUserClient(serviceName string, lb loadbalance.Balance, tracer opentracing.Tracer) (UserClient, error) {
 	if serviceName == "" {
 		serviceName = "user"
 	}
@@ -38,10 +38,10 @@ func NewUserClient(serviceName string, lb loadbalance.Balance, tracer opentracin
 
 	return &UserClientImpl{
 		manager: &DefaultClientManager{
-			serviceName: serviceName,
-			loadbalance: lb,
-			discoverClient:discover.ConsulService,
-			logger:discover.Logger,
+			serviceName:    serviceName,
+			loadbalance:    lb,
+			discoverClient: discover.ConsulService,
+			logger:         discover.Logger,
 		},
 		serviceName: serviceName,
 		loadBalance: lb,

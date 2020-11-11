@@ -1,8 +1,8 @@
 package endpoint
 
 import (
-	"SpeedKill/oauth-service/model"
-	"SpeedKill/oauth-service/service"
+	"SecondKill/oauth-service/model"
+	"SecondKill/oauth-service/service"
 	"context"
 	"errors"
 	"github.com/go-kit/kit/endpoint"

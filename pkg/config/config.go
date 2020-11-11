@@ -1,16 +1,16 @@
 package config
 
 import (
-	"SpeedKill/pkg/bootstrap"
-	"SpeedKill/pkg/discover"
+	"SecondKill/pkg/bootstrap"
+	"SecondKill/pkg/discover"
+	"fmt"
 	"github.com/go-kit/kit/log"
 	"github.com/openzipkin/zipkin-go"
-	"github.com/spf13/viper"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
+	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"strconv"
-	"fmt"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 var ZipkinTracer *zipkin.Tracer
 var Logger log.Logger
 
-func init()  {
+func init() {
 	Logger = log.NewLogfmtLogger(os.Stderr)
 	Logger = log.With(Logger, "ts", log.DefaultTimestamp)
 	Logger = log.With(Logger, "caller", log.DefaultCaller)
@@ -36,7 +36,6 @@ func init()  {
 	Logger.Log("zipkin url", zipkinUrl)
 	initTracer(zipkinUrl)
 }
-
 
 func initDefault() {
 	viper.SetDefault(kConfigType, "yaml")
@@ -73,11 +72,11 @@ func Sub(key string, value interface{}) error {
 	return sub.Unmarshal(value)
 }
 
-func initTracer(url string)  {
+func initTracer(url string) {
 	var (
-		err error
+		err           error
 		useNoopTracer = url == ""
-		reporter = zipkinhttp.NewReporter(url)
+		reporter      = zipkinhttp.NewReporter(url)
 	)
 	zEP, _ := zipkin.NewEndpoint(bootstrap.DiscoverConfig.ServiceName, bootstrap.HttpConfig.Port)
 	ZipkinTracer, err = zipkin.NewTracer(

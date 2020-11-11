@@ -1,7 +1,7 @@
 package loadbalance
 
 import (
-	"SpeedKill/pkg/common"
+	"SecondKill/pkg/common"
 	"errors"
 	"math/rand"
 )
@@ -26,7 +26,7 @@ func (WeightRoundRobinLoadBalance) SelectBalance(serives []*common.ServiceInstan
 		return nil, errors.New("service instance are not exist")
 	}
 	total := 0
-	for i:=0; i<len(serives); i++ {
+	for i := 0; i < len(serives); i++ {
 		w := serives[i]
 		if w == nil {
 			continue
@@ -38,7 +38,7 @@ func (WeightRoundRobinLoadBalance) SelectBalance(serives []*common.ServiceInstan
 		}
 	}
 	if best == nil {
-		return nil,  errors.New("service instance are not exist")
+		return nil, errors.New("service instance are not exist")
 	}
 	best.CurWeight -= total
 	return best, nil
@@ -47,8 +47,8 @@ func (WeightRoundRobinLoadBalance) SelectBalance(serives []*common.ServiceInstan
 type SuffleBalance struct{}
 
 func (SuffleBalance) SelectBalance(serives []*common.ServiceInstance) (*common.ServiceInstance, error) {
-	if serives == nil || len(serives) < 1{
-		return nil,  errors.New("service instance are not exist")
+	if serives == nil || len(serives) < 1 {
+		return nil, errors.New("service instance are not exist")
 	}
 	//for i:= len(serives); i>0; i-- {
 	//	lastIdex := i -1
@@ -58,4 +58,3 @@ func (SuffleBalance) SelectBalance(serives []*common.ServiceInstance) (*common.S
 	b := rand.Perm(len(serives))
 	return serives[b[0]], nil
 }
-

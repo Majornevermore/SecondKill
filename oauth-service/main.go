@@ -1,24 +1,28 @@
 package main
 
 import (
-	localconfig "SpeedKill/oauth-service/config"
-	"SpeedKill/oauth-service/endpoint"
-	"SpeedKill/oauth-service/plugins"
-	"SpeedKill/oauth-service/service"
-	"SpeedKill/pkg/bootstrap"
-	"SpeedKill/pkg/config"
-	"SpeedKill/pkg/mysql"
+	localconfig "SecondKill/oauth-service/config"
+	"SecondKill/oauth-service/endpoint"
+	"SecondKill/oauth-service/plugins"
+	"SecondKill/oauth-service/service"
+	"SecondKill/oauth-service/transport"
+	"SecondKill/pkg/bootstrap"
+	"SecondKill/pkg/config"
+	register "SecondKill/pkg/discover"
+	"SecondKill/pkg/mysql"
+	"context"
 	"flag"
 	"fmt"
 	kitzipkin "github.com/go-kit/kit/tracing/zipkin"
 	"golang.org/x/time/rate"
+	"net/http"
 	"time"
 )
 
 func main() {
 	var (
 		servicePort = flag.String("service.port", bootstrap.HttpConfig.Port, "service port")
-		grpcAddr    = flag.String("grpc", bootstrap.RpcConfig.Port, "gRPC listen address.")
+		//grpcAddr    = flag.String("grpc", bootstrap.RpcConfig.Port, "gRPC listen address.")
 	)
 
 	var (
@@ -62,11 +66,12 @@ func main() {
 	healthEndpoint = kitzipkin.TraceEndpoint(localconfig.ZipkinTracer, "health-endpoint")(healthEndpoint)
 	endpts := endpoint.OAuth2Endpoints{
 		TokenEndpoint:          tokenEndpoint,
-		CheckTokenEndpoint:     checkTokenEndpoint,
+		CheckTokenEndpoint:     checkEndpoint,
 		HealthCheckEndpoint:    healthEndpoint,
 		GRPCCheckTokenEndpoint: gRPCCheckTokenEndpoint,
 	}
-
+	ctx := context.Background()
+	errChan := make(chan error)
 	//创建http.Handler
 	r := transport.MakeHttpHandler(ctx, endpts, tokenService, clientDetailsService, localconfig.ZipkinTracer, localconfig.Logger)
 
@@ -75,5 +80,8 @@ func main() {
 		fmt.Printf("http server start at port:" + *servicePort)
 		mysql.InitMysql(config.MysqlConfig.Host, config.MysqlConfig.Port, config.MysqlConfig.User,
 			config.MysqlConfig.Pwd, config.MysqlConfig.Db)
+		register.Register()
+		handler := r
+		errChan <- http.ListenAndServe(":"+*servicePort, handler)
 	}()
 }

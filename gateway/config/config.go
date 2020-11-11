@@ -1,7 +1,7 @@
 package config
 
 import (
-	conf "SpeedKill/pkg/config"
+	conf "SecondKill/pkg/config"
 	"github.com/go-kit/kit/log"
 	"github.com/spf13/viper"
 	"os"
@@ -12,7 +12,6 @@ const (
 )
 
 var Logger log.Logger
-
 
 func init() {
 	Logger = log.NewLogfmtLogger(os.Stderr)

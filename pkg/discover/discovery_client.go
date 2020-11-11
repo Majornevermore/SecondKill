@@ -1,7 +1,7 @@
 package discover
 
 import (
-	"SpeedKill/pkg/common"
+	"SecondKill/pkg/common"
 	"github.com/go-kit/kit/sd/consul"
 	"github.com/hashicorp/consul/api"
 	"log"
@@ -25,5 +25,4 @@ type DiscoveryClient interface {
 	DeRegister(instaceID string, logger *log.Logger) bool
 
 	DiscoverServices(serviceName string, logger *log.Logger) []*common.ServiceInstance
-
 }

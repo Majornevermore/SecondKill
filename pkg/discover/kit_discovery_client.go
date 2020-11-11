@@ -1,7 +1,7 @@
 package discover
 
 import (
-	"SpeedKill/pkg/common"
+	"SecondKill/pkg/common"
 	"github.com/go-kit/kit/sd/consul"
 	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/api/watch"
@@ -19,8 +19,8 @@ func NewConsulClientInstance(consulHost, consulPort string) *KitDiscoveryClient 
 	}
 	client := consul.NewClient(apiClient)
 	return &KitDiscoveryClient{
-		Host: consulHost,
-		Port: port,
+		Host:   consulHost,
+		Port:   port,
 		client: client,
 		config: consulConfig,
 	}
@@ -29,19 +29,19 @@ func NewConsulClientInstance(consulHost, consulPort string) *KitDiscoveryClient 
 func (consulClient *KitDiscoveryClient) Register(instanceId, svcHost, healthCheckUrl, svcPort string, svcName string, weight int, meta map[string]string, tags []string, logger *log.Logger) bool {
 	port, _ := strconv.Atoi(svcPort)
 	serviceRegistration := &api.AgentServiceRegistration{
-		ID: instanceId,
-		Name: svcName,
+		ID:      instanceId,
+		Name:    svcName,
 		Address: svcHost,
-		Port: port,
-		Meta: meta,
-		Tags: tags,
+		Port:    port,
+		Meta:    meta,
+		Tags:    tags,
 		Weights: &api.AgentWeights{
 			Passing: weight,
 		},
 		Check: &api.AgentServiceCheck{
 			DeregisterCriticalServiceAfter: "30",
-			HTTP: "http://" + svcHost + ":" + strconv.Itoa(port) + healthCheckUrl,
-			Interval: "15",
+			HTTP:                           "http://" + svcHost + ":" + strconv.Itoa(port) + healthCheckUrl,
+			Interval:                       "15",
 		},
 	}
 	err := consulClient.client.Register(serviceRegistration)
@@ -126,14 +126,14 @@ func (consulClient *KitDiscoveryClient) DiscoverServices(serviceName string, log
 		return nil
 	}
 	instance := make([]*common.ServiceInstance, len(entries))
-	for i:=0; i<len(instance); i++ {
+	for i := 0; i < len(instance); i++ {
 		instance[i] = newServiceInstance(entries[i].Service)
 	}
 	consulClient.instancesMap.Store(serviceName, instance)
 	return instance
 }
 
-func newServiceInstance(service *api.AgentService)  *common.ServiceInstance{
+func newServiceInstance(service *api.AgentService) *common.ServiceInstance {
 	rpcPort := service.Port - 1
 	if service.Meta != nil {
 		if rpcPortString, ok := service.Meta["rpcPort"]; ok {

@@ -1,9 +1,9 @@
 package client
 
 import (
+	"SecondKill/pb"
 	"context"
 	"fmt"
-	"SpeedKill/pb"
 	_ "github.com/opentracing/opentracing-go"
 	_ "github.com/openzipkin-contrib/zipkin-go-opentracing"
 	_ "log"
@@ -22,6 +22,7 @@ func TestUserClientImpl_CheckUser(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 }
+
 //
 //func genTracerAct(tracer opentracing.Tracer) opentracing.Tracer {
 //	if tracer != nil {

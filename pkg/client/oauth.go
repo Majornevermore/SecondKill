@@ -1,15 +1,15 @@
 package client
 
 import (
-	"SpeedKill/pb"
-	"SpeedKill/pkg/discover"
-	"SpeedKill/pkg/loadbalance"
+	"SecondKill/pb"
+	"SecondKill/pkg/discover"
+	"SecondKill/pkg/loadbalance"
 	"context"
 	"github.com/opentracing/opentracing-go"
 )
 
 type OAuthClient interface {
-	CheckToken(ctx context.Context, tracer opentracing.Tracer, request *pb.CheckTokenRequest ) (*pb.CheckTokenResponse, error)
+	CheckToken(ctx context.Context, tracer opentracing.Tracer, request *pb.CheckTokenRequest) (*pb.CheckTokenResponse, error)
 }
 
 func (O *OAuthClientImpl) CheckToken(ctx context.Context, tracer opentracing.Tracer, request *pb.CheckTokenRequest) (*pb.CheckTokenResponse, error) {
@@ -38,10 +38,10 @@ func NewOAuthClient(serviceName string, lb loadbalance.Balance, tracer opentraci
 
 	return &OAuthClientImpl{
 		manager: &DefaultClientManager{
-			serviceName: serviceName,
-			loadbalance: lb,
-			discoverClient:discover.ConsulService,
-			logger:discover.Logger,
+			serviceName:    serviceName,
+			loadbalance:    lb,
+			discoverClient: discover.ConsulService,
+			logger:         discover.Logger,
 		},
 		serviceName: serviceName,
 		loadBalance: lb,

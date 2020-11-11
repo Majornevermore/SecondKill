@@ -1,11 +1,11 @@
 package router
 
 import (
-	"SpeedKill/gateway/config"
-	"SpeedKill/pb"
-	"SpeedKill/pkg/client"
-	"SpeedKill/pkg/discover"
-	"SpeedKill/pkg/loadbalance"
+	"SecondKill/gateway/config"
+	"SecondKill/pb"
+	"SecondKill/pkg/client"
+	"SecondKill/pkg/discover"
+	"SecondKill/pkg/loadbalance"
 	"context"
 	"errors"
 	"fmt"
@@ -20,19 +20,19 @@ import (
 )
 
 type HystrixRouter struct {
-	svcMap *sync.Map // 服务实例，存储已通过hystrix监控
-	log log.Logger // 日志工具
-	fallbackMsg string // 回调消息
-	tracer *zipkin.Tracer
+	svcMap      *sync.Map  // 服务实例，存储已通过hystrix监控
+	log         log.Logger // 日志工具
+	fallbackMsg string     // 回调消息
+	tracer      *zipkin.Tracer
 	loadbalance loadbalance.Balance
 }
 
 func Router(zipTracer *zipkin.Tracer, fbMsg string, logger log.Logger) http.Handler {
 	return HystrixRouter{
-		svcMap: &sync.Map{},
-		log: logger,
+		svcMap:      &sync.Map{},
+		log:         logger,
 		fallbackMsg: fbMsg,
-		tracer: zipTracer,
+		tracer:      zipTracer,
 		loadbalance: &loadbalance.RandomBalance{},
 	}
 }
@@ -105,8 +105,8 @@ func (router HystrixRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			proxyError = err
 		}
 		proxy := &httputil.ReverseProxy{
-			Director: director,
-			Transport : roundTip,
+			Director:     director,
+			Transport:    roundTip,
 			ErrorHandler: errorHandle,
 		}
 		proxy.ServeHTTP(w, r)
@@ -123,6 +123,3 @@ func (router HystrixRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 	}
 }
-
-
-

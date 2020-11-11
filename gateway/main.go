@@ -1,9 +1,9 @@
 package main
 
 import (
-	"SpeedKill/gateway/router"
-	"SpeedKill/pkg/bootstrap"
-	register "SpeedKill/pkg/discover"
+	"SecondKill/gateway/router"
+	"SecondKill/pkg/bootstrap"
+	register "SecondKill/pkg/discover"
 	"flag"
 	"fmt"
 	"github.com/afex/hystrix-go/hystrix"
@@ -18,7 +18,7 @@ import (
 	"syscall"
 )
 
-func main()  {
+func main() {
 	// 创建环境变量
 	var (
 		zipkinURL = flag.String("zipkin.url", "http://localhost:9411/api/v2/spans", "Zipkin server url")
@@ -77,7 +77,7 @@ func main()  {
 		register.Register()
 		errc <- http.ListenAndServe("9090", handle)
 	}()
-	err := <- errc
+	err := <-errc
 	register.DeRegister()
 	logger.Log("exit", err)
 }

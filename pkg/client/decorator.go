@@ -1,19 +1,19 @@
 package client
 
 import (
-	_ "SpeedKill/pkg/bootstrap"
-	"SpeedKill/pkg/discover"
-	"SpeedKill/pkg/loadbalance"
-	_ "SpeedKill/pkg/config"
+	_ "SecondKill/pkg/bootstrap"
+	_ "SecondKill/pkg/config"
+	"SecondKill/pkg/discover"
+	"SecondKill/pkg/loadbalance"
 	"context"
+	"errors"
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	"github.com/opentracing/opentracing-go"
-	_  "github.com/openzipkin-contrib/zipkin-go-opentracing"
+	_ "github.com/openzipkin-contrib/zipkin-go-opentracing"
 	"google.golang.org/grpc"
 	"log"
 	"strconv"
-	"errors"
 	"time"
 )
 
@@ -21,18 +21,19 @@ var defaultLoadBalance loadbalance.Balance = &loadbalance.RandomBalance{}
 var (
 	ErrRPCService = errors.New("no rpc service")
 )
+
 type ClientManager interface {
 	DecoratorInvoke(path string, hystrixName string, tracer opentracing.Tracer,
 		ctx context.Context, inputVal interface{}, outVal interface{}) (err error)
 }
 
-type DefaultClientManager struct{
-	serviceName string
-	logger *log.Logger
+type DefaultClientManager struct {
+	serviceName    string
+	logger         *log.Logger
 	discoverClient discover.DiscoveryClient
-	loadbalance loadbalance.Balance
-	after []InvokerAfterFunc
-	before []InvokerBeforeFunc
+	loadbalance    loadbalance.Balance
+	after          []InvokerAfterFunc
+	before         []InvokerBeforeFunc
 }
 
 type InvokerAfterFunc func() (err error)

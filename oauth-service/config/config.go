@@ -1,8 +1,8 @@
 package config
 
 import (
-	"SpeedKill/pkg/bootstrap"
-	conf "SpeedKill/pkg/config"
+	"SecondKill/pkg/bootstrap"
+	conf "SecondKill/pkg/config"
 	"github.com/go-kit/kit/log"
 	"github.com/openzipkin/zipkin-go"
 	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"

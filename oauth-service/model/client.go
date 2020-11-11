@@ -1,7 +1,7 @@
 package model
 
 import (
-	"SpeedKill/pkg/mysql"
+	"SecondKill/pkg/mysql"
 	"encoding/json"
 	"log"
 )

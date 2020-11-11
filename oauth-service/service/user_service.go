@@ -1,9 +1,9 @@
 package service
 
 import (
-	"SpeedKill/oauth-service/model"
-	"SpeedKill/pb"
-	"SpeedKill/pkg/client"
+	"SecondKill/oauth-service/model"
+	"SecondKill/pb"
+	"SecondKill/pkg/client"
 	"context"
 	"errors"
 )

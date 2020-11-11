@@ -1,7 +1,7 @@
 package service
 
 import (
-	"SpeedKill/oauth-service/model"
+	"SecondKill/oauth-service/model"
 	"context"
 	"errors"
 )
