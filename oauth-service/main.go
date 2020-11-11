@@ -1,1 +1,5 @@
-package oauth_service
+package main
+
+func main() {
+
+}
