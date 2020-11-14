@@ -6,6 +6,7 @@ import (
 	"SecondKill/oauth-service/plugins"
 	"SecondKill/oauth-service/service"
 	"SecondKill/oauth-service/transport"
+	"SecondKill/pb"
 	"SecondKill/pkg/bootstrap"
 	"SecondKill/pkg/config"
 	register "SecondKill/pkg/discover"
@@ -14,15 +15,22 @@ import (
 	"flag"
 	"fmt"
 	kitzipkin "github.com/go-kit/kit/tracing/zipkin"
+	"google.golang.org/grpc"
+	"github.com/openzipkin/zipkin-go/propagation/b3"
 	"golang.org/x/time/rate"
+	"google.golang.org/grpc/metadata"
+	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
 func main() {
 	var (
 		servicePort = flag.String("service.port", bootstrap.HttpConfig.Port, "service port")
-		//grpcAddr    = flag.String("grpc", bootstrap.RpcConfig.Port, "gRPC listen address.")
+		grpcAddr    = flag.String("grpc", bootstrap.RpcConfig.Port, "gRPC listen address.")
 	)
 
 	var (
@@ -84,4 +92,34 @@ func main() {
 		handler := r
 		errChan <- http.ListenAndServe(":"+*servicePort, handler)
 	}()
+
+	// grpc
+	go func() {
+		fmt.Println("grpc Server start at port:" + *grpcAddr)
+		listener, err := net.Listen("tcp", ":"+*grpcAddr)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		serverTracer := kitzipkin.GRPCServerTrace(localconfig.ZipkinTracer, kitzipkin.Name("grpc-transport"))
+		tr := localconfig.ZipkinTracer
+		md := metadata.MD{}
+		parentSpan := tr.StartSpan("test")
+		b3.InjectGRPC(&md)(parentSpan.Context())
+		ctx := metadata.NewIncomingContext(context.Background(), md)
+		handler := transport.NewGRPCServer(ctx, endpts, serverTracer)
+		gRPCServer := grpc.NewServer()
+		pb.RegisterOAuthServiceServer(gRPCServer, handler)
+		errChan <- gRPCServer.Serve(listener)
+	}()
+
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		errChan <- fmt.Errorf("%s", <-c)
+	}()
+	error := <-errChan
+	//服务退出取消注册
+	register.DeRegister()
+	fmt.Println(error)
 }
